@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from Participante import views as participante_views  # importa tu vista
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('participante/', include('Participante.urls')),
+    path('participante/', include('Participante.urls')),  # tus rutas de la app
+    path('', participante_views.buscar_participante),     # la raíz apunta a tu vista principal
 ]
