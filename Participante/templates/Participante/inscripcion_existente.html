@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ya inscrito en el curso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d9534f;
+            text-align: center;
+        }
+        p {
+            text-align: center;
+            font-size: 16px;
+        }
+        .btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #5cb85c;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ya estás inscrito en este curso</h1>
+        <p><strong>{{ participante.nombres }} {{ participante.apellido_paterno }}</strong>,
+        ya te has inscrito en <strong>{{ curso.NombreCurso }}</strong>.</p>
+
+        <p>Puedes volver a la pantalla de inicio para realizar otra búsqueda o registro.</p>
+
+        <!-- 🔹 Botón corregido: redirige a la vista de búsqueda -->
+        <a href="{% url 'participante:buscar_participante' %}" class="btn">Volver al inicio</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Curso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .form-container {
+            width: 50%;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 15px 0 5px;
+        }
+        select, input[type="checkbox"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            border-color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Seleccionar Curso</h1>
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="curso">Curso:</label>
+            <select id="curso" name="curso">
+                <option value="">-- Selecciona un curso --</option>
+                {% for curso in cursos %}
+                    <option value="{{ curso.IdCurso }}"
+                            data-idmodalidad="{{ curso.IdModalidad }}"
+                            data-idformato="{{ curso.IdFormato }}"
+                            data-imagen="{{ curso.ImagenSitioWebCurso }}">
+                        {{ curso.NombreCurso }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Contenedor de la imagen del curso -->
+            <div id="curso-imagen-container" style="text-align:center; margin: 1.5rem 0; display:none;">
+                <img id="curso-imagen"
+                     src=""
+                     alt="Imagen del curso"
+                     style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.15);" />
+            </div>
+
+            <div id="modalidad-container" style="display:none;">
+                <label for="modalidad">Modalidad:</label>
+                <select id="modalidad" name="modalidad">
+                    <option value="">-- Selecciona una modalidad --</option>
+                    {% for modalidad in modalidades %}
+                        <option value="{{ modalidad.IdModalidad }}">{{ modalidad.NombreModalidad }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="certificado-container" style="display:none;">
+                <label id="certificado-label" for="certificado">¿Desea certificado?</label>
+                <select id="certificado" name="certificado">
+                    <option value="">-- Selecciona una opción --</option>
+                    <option value="1">Sí</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+
+            <input type="submit" value="Confirmar Inscripción">
+        </form>
+    </div>
+
+    <script>
+        const cursoSelect = document.getElementById("curso");
+        const modalidadContainer = document.getElementById("modalidad-container");
+        const modalidadSelect = document.getElementById("modalidad");
+        const certificadoContainer = document.getElementById("certificado-container");
+        const certificadoLabel = document.getElementById("certificado-label");
+        const certificadoSelect = document.getElementById("certificado");
+
+        // Imagen del curso
+        const imagenContainer = document.getElementById("curso-imagen-container");
+        const imagenTag = document.getElementById("curso-imagen");
+
+        cursoSelect.addEventListener("change", function() {
+            const selectedOption = cursoSelect.options[cursoSelect.selectedIndex];
+            const idModalidad = parseInt(selectedOption.dataset.idmodalidad);
+            const idFormato = parseInt(selectedOption.dataset.idformato);
+            const imagenCurso = selectedOption.dataset.imagen;
+
+            // Mostrar/ocultar modalidad
+            if (idModalidad === 3) {
+                modalidadContainer.style.display = "block";
+            } else {
+                modalidadContainer.style.display = "none";
+            }
+
+            // Mostrar/ocultar certificado
+            if ([6, 7].includes(idFormato)) {
+                certificadoContainer.style.display = "block";
+                if (idFormato === 6) {
+                    certificadoLabel.textContent = "¿Desea certificado?";
+                } else if (idFormato === 7) {
+                    certificadoLabel.textContent = "¿Te gustaría participar en el taller privado?";
+                }
+            } else {
+                certificadoContainer.style.display = "none";
+            }
+
+            // Mostrar imagen si existe
+            if (imagenCurso) {
+                imagenTag.src = imagenCurso;
+                imagenContainer.style.display = "block";
+            } else {
+                imagenTag.src = "";
+                imagenContainer.style.display = "none";
+            }
+
+            // Limpiar borde rojo al cambiar selección
+            cursoSelect.classList.remove("error");
+            modalidadSelect.classList.remove("error");
+            certificadoSelect.classList.remove("error");
+        });
+
+        document.querySelector("form").addEventListener("submit", function(event) {
+            let valid = true;
+
+            // Validar curso
+            if (cursoSelect.value === "") {
+                cursoSelect.classList.add("error");
+                valid = false;
+            } else {
+                cursoSelect.classList.remove("error");
+            }
+
+            // Validar modalidad si es visible
+            if (modalidadContainer.style.display === "block" && modalidadSelect.value === "") {
+                modalidadSelect.classList.add("error");
+                valid = false;
+            } else {
+                modalidadSelect.classList.remove("error");
+            }
+
+            // Validar certificado si es visible
+            if (certificadoContainer.style.display === "block" && certificadoSelect.value === "") {
+                certificadoSelect.classList.add("error");
+                valid = false;
+            } else {
+                certificadoSelect.classList.remove("error");
+            }
+
+            if (!valid) {
+                event.preventDefault();
+                alert("Por favor, complete todos los campos obligatorios.");
+            }
+        });
+    </script>
+</body>
+</html>

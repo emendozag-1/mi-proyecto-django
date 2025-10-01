@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Inscripción Exitosa</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; background-color: #f0f0f0; }
+        .container { background: white; padding: 2rem; border-radius: 8px; max-width: 600px; margin: auto; }
+        h1 { color: #2c3e50; }
+        p { font-size: 1.1rem; }
+        a { text-decoration: none; color: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Inscripción Exitosa</h1>
+        <p>Participante: {{ participante.nombres }} {{ participante.apellido_paterno }} {{ participante.apellido_materno }}</p>
+        <p>Curso: {{ curso.NombreCurso }}</p>
+        <a href="{% url 'participante:buscar_participante' %}">Volver a búsqueda de participantes</a>
+    </div>
+</body>
+</html>
