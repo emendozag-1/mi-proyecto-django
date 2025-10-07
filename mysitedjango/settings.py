@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# CSRF Configuration for Azure deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://rec-joseantonioencinas-dyc0d4dngbh8fjc2.brazilsouth-01.azurewebsites.net',
+]
+
 
 # Application definition
 
