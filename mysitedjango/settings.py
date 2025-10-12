@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ['*']
 # CSRF Configuration for Azure deployment
 CSRF_TRUSTED_ORIGINS = [
     'https://rec-joseantonioencinas-dyc0d4dngbh8fjc2.brazilsouth-01.azurewebsites.net',
+    'https://formularioinscripcion-apa5ctf0f9h3gmgz.canadacentral-01.azurewebsites.net',
 ]
 
 
