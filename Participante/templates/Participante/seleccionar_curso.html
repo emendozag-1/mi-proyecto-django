@@ -61,6 +61,19 @@
 <body>
     <div class="form-container">
         <h1>Seleccionar Curso</h1>
+        
+        {% if mensaje_error %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+            <strong>Error de validación:</strong> {{ mensaje_error }}
+        </div>
+        {% endif %}
+
+        {% if mensaje_excepcion %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+            <strong>Error del sistema:</strong> {{ mensaje_excepcion }}
+        </div>
+        {% endif %}
+
         <form method="post">
             {% csrf_token %}
 

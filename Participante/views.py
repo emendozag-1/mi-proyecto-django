@@ -128,68 +128,74 @@ def seleccionar_curso(request, id_participante):
 
     mostrar_certificado = False
     mensaje_error = None  # Para mostrar errores de validación
+    mensaje_excepcion = None # Para mostrar errores técnicos
 
-    if request.method == 'POST':
-        id_curso = request.POST.get('curso')
-        id_modalidad_seleccionada = request.POST.get('modalidad')
-        desea_certificado = request.POST.get('desea_certificado')
+    try:
+        if request.method == 'POST':
+            id_curso = request.POST.get('curso')
+            id_modalidad_seleccionada = request.POST.get('modalidad')
+            desea_certificado = request.POST.get('desea_certificado')
 
-        # VALIDACIONES
-        errores = []
-        curso_obj = None
-        if not id_curso:
-            errores.append("Debe seleccionar un curso.")
-        else:
-            curso_obj = Fact_Curso.objects.get(IdCurso=id_curso)
-            if curso_obj.IdModalidad == 3 and not id_modalidad_seleccionada:
-                errores.append("Debe seleccionar una modalidad.")
-            if curso_obj.IdFormato in [6, 7] and not desea_certificado:
-                errores.append("Debe seleccionar su preferencia en el desplegable correspondiente.")
-            if curso_obj.IdFormato in [6, 7]:
-                mostrar_certificado = True
-
-        if errores:
-            mensaje_error = " ".join(errores)
-        else:
-            # ===========================
-            # NUEVO: VERIFICAR INSCRIPCIÓN EXISTENTE
-            # ===========================
-            id_formateado = f"JAE{str(participante.id).zfill(7)}"
-            inscripcion_existente = Fact_Inscripcion.objects.filter(
-                IdParticipante=id_formateado,
-                IdCurso=curso_obj.IdCurso
-            ).first()
-
-            if inscripcion_existente:
-                # Si ya existe inscripción, mostrar página especial
-                return render(request, 'Participante/inscripcion_existente.html', {
-                    "participante": participante,
-                    "curso": curso_obj,
-                    "inscripcion": inscripcion_existente
-                })
+            # VALIDACIONES
+            errores = []
+            curso_obj = None
+            if not id_curso:
+                errores.append("Debe seleccionar un curso.")
             else:
-                # CREAR INSCRIPCIÓN NUEVA
-                Fact_Inscripcion.objects.create(
+                curso_obj = Fact_Curso.objects.get(IdCurso=id_curso)
+                if curso_obj.IdModalidad == 3 and not id_modalidad_seleccionada:
+                    errores.append("Debe seleccionar una modalidad.")
+                if curso_obj.IdFormato in [6, 7] and not desea_certificado:
+                    errores.append("Debe seleccionar su preferencia en el desplegable correspondiente.")
+                if curso_obj.IdFormato in [6, 7]:
+                    mostrar_certificado = True
+
+            if errores:
+                mensaje_error = " ".join(errores)
+            else:
+                # ===========================
+                # NUEVO: VERIFICAR INSCRIPCIÓN EXISTENTE
+                # ===========================
+                id_formateado = f"JAE{str(participante.id).zfill(7)}"
+                inscripcion_existente = Fact_Inscripcion.objects.filter(
                     IdParticipante=id_formateado,
-                    IdCurso=curso_obj.IdCurso,
-                    IdEstadoEntregaAcreditacion=2,
-                    IdEstadoInscripcion=1,
-                    UsuarioRegistroInscripcion="Sitio Web",
-                    FechaInscripcion=date.today(),
-                    IdModalidad=int(id_modalidad_seleccionada) if id_modalidad_seleccionada else None,
-                    DeseaCertificadoInscripcion=desea_certificado == '1'
-                )
-                return render(request, 'Participante/inscripcion_exitosa.html', {
-                    "participante": participante,
-                    "curso": curso_obj
-                })
+                    IdCurso=curso_obj.IdCurso
+                ).first()
+
+                if inscripcion_existente:
+                    # Si ya existe inscripción, mostrar página especial
+                    return render(request, 'Participante/inscripcion_existente.html', {
+                        "participante": participante,
+                        "curso": curso_obj,
+                        "inscripcion": inscripcion_existente
+                    })
+                else:
+                    # CREAR INSCRIPCIÓN NUEVA
+                    Fact_Inscripcion.objects.create(
+                        IdParticipante=id_formateado,
+                        IdCurso=curso_obj.IdCurso,
+                        IdEstadoEntregaAcreditacion=2,
+                        IdEstadoInscripcion=1,
+                        UsuarioRegistroInscripcion="Sitio Web",
+                        FechaInscripcion=date.today(),
+                        IdModalidad=int(id_modalidad_seleccionada) if id_modalidad_seleccionada else None,
+                        DeseaCertificadoInscripcion=desea_certificado == '1'
+                    )
+                    return render(request, 'Participante/inscripcion_exitosa.html', {
+                        "participante": participante,
+                        "curso": curso_obj
+                    })
+    except Exception as e:
+        # Capturamos cualquier error en la selección o guardado
+        mensaje_excepcion = f"Ocurrió un error inesperado: {str(e)}"
 
     context = {
         "participante": participante,
         "cursos": cursos,
         "modalidades": modalidades,
         "mostrar_certificado": mostrar_certificado,
-        "mensaje_error": mensaje_error
+        "mensaje_error": mensaje_error,
+        "mensaje_excepcion": mensaje_excepcion
     }
     return render(request, 'Participante/seleccionar_curso.html', context)
 

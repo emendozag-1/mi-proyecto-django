@@ -14,7 +14,7 @@ class Fact_Curso(models.Model):
     IdEntidad = models.IntegerField(null=True, blank=True)
     IdPonente = models.CharField(max_length=8, null=True, blank=True)
     NombreCurso = models.CharField(max_length=200)
-    ConfirmacionInHouseCurso = models.IntegerField(null=True, blank=True)
+    # ConfirmacionInHouseCurso = models.IntegerField(null=True, blank=True)
     FechaCoordinacionCurso = models.DateField(null=True, blank=True)
     FechaRequerimientoCurso = models.DateField(null=True, blank=True)
     FechaAperturaCurso = models.DateField(null=True, blank=True)
