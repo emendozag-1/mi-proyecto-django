@@ -1,111 +1,36 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Buscar Participante</title>
-    <style>
-        /* ====== TU DISEÑO ORIGINAL (no modificado) ====== */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-            padding: 2rem;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .form-container h1 {
-            font-size: 1.6rem;
-            margin-bottom: 1.5rem;
-            color: #202124;
-        }
-        .form-container h2 {
-            font-size: 1.2rem;
-            margin-top: 1.5rem;
-            color: #5f6368;
-        }
-        label {
-            font-weight: 500;
-            margin-top: 1rem;
-            display: block;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 0.6rem;
-            margin-top: 0.3rem;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        button {
-            margin-top: 1rem;
-            padding: 0.8rem 1.2rem;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1669c1;
-        }
-        .info-box {
-            background: #f1f3f4;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-        }
+{% extends 'Participante/base.html' %}
+{% load static %}
 
-        /* ====== VALIDACIÓN (colores de relleno + borde) ====== */
-        .is-valid {
-            border: 2px solid #28a745 !important; /* borde */
-            background-color: #f0fff3 !important; /* relleno suave verde */
-        }
-        .is-invalid {
-            border: 2px solid #dc3545 !important;  /* borde */
-            background-color: #fff3f3 !important;  /* relleno suave rojo */
-        }
+{% block title %}Buscar Participante{% endblock %}
 
-        /* Mantener todo responsive */
-        @media (max-width: 640px) {
-            .form-container { padding: 1rem; }
-        }
-    </style>
-</head>
-<body>
+{% block content %}
 <div class="form-container">
     <h1>Buscar o Registrar Participante</h1>
 
     <!-- ================== FORMULARIO DE BÚSQUEDA (GET) ================== -->
-<form id="form-buscar" method="get" novalidate>
-    <label for="tipo_documento_buscar">Tipo Documento:</label>
-    <select id="tipo_documento_buscar" name="tipo_documento" required>
-        <option value="">--Seleccione Tipo Documento--</option>
-        {% for td in tipos_documento %}
-            <option value="{{ td.id }}" {% if tipo_doc_id and tipo_doc_id|add:"0" == td.id|stringformat:"s" %}selected{% endif %}>
-                {{ td.nombre }}
-            </option>
-        {% endfor %}
-    </select>
+    <form id="form-buscar" method="get" novalidate>
+        <label for="tipo_documento_buscar">Tipo Documento:</label>
+        <select id="tipo_documento_buscar" name="tipo_documento" required>
+            <option value="">--Seleccione Tipo Documento--</option>
+            {% for td in tipos_documento %}
+                <option value="{{ td.id }}" {% if tipo_doc_id and tipo_doc_id|add:"0" == td.id|stringformat:"s" %}selected{% endif %}>
+                    {{ td.nombre }}
+                </option>
+            {% endfor %}
+        </select>
 
-    <label for="dni">Número Documento:</label>
-    <input type="text" id="dni" name="dni" value="{{ dni|default:'' }}" required>
+        <label for="dni">Número Documento:</label>
+        <input type="text" id="dni" name="dni" value="{{ dni|default:'' }}" required>
 
-    <button type="submit">Buscar</button>
-</form>
+        <button type="submit">Buscar</button>
+    </form>
 
-<!-- ====== MENSAJE DE INFO ====== -->
-{% if mensaje_info %}
-<div class="info-box" style="background-color:#fff3cd; border:1px solid #ffeeba;">
-    {{ mensaje_info }}
-</div>
-{% endif %}
+    <!-- ====== MENSAJE DE INFO ====== -->
+    {% if mensaje_info %}
+    <div class="info-box" style="background-color:#fff3cd; border:1px solid #ffeeba;">
+        {{ mensaje_info }}
+    </div>
+    {% endif %}
 
 
     <!-- ================== FORMULARIO DE REGISTRO / EDICIÓN (POST) ================== -->
@@ -252,162 +177,8 @@
         <button type="submit">Guardar</button>
     </form>
 </div>
+{% endblock %}
 
-<!-- ================== SCRIPTS: CASCADA + VALIDACIÓN ================== -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-
-    /* ========== Helper de validación para cualquier form ========== */
-    function setupValidation(formId) {
-        const form = document.getElementById(formId);
-        if (!form) return;
-
-        // evitar validación nativa del navegador (usamos nuestra visual)
-        form.setAttribute('novalidate', 'novalidate');
-
-        // marcar si el usuario ya intentó enviar
-        form._attempted = false;
-
-        // solo campos que tengan required (para no validar elementos ocultos o no obligatorios)
-        const fields = Array.from(form.querySelectorAll('[required]'));
-
-        // estado inicial: si el campo ya trae valor del servidor, marcarlo como válido visualmente
-        fields.forEach(f => {
-            const v = (f.value === null) ? "" : String(f.value).trim();
-            if (v !== "") {
-                f.classList.add('is-valid');
-            } else {
-                f.classList.remove('is-valid','is-invalid');
-            }
-
-            // listeners para actualizar visual en tiempo real (input/change)
-            const handler = function() {
-                const val = (f.value === null) ? "" : String(f.value).trim();
-                if (val !== "") {
-                    f.classList.remove('is-invalid');
-                    f.classList.add('is-valid');
-                } else {
-                    if (form._attempted) {
-                        f.classList.remove('is-valid');
-                        f.classList.add('is-invalid');
-                    } else {
-                        f.classList.remove('is-valid','is-invalid');
-                    }
-                }
-            };
-            f.addEventListener('input', handler);
-            f.addEventListener('change', handler);
-        });
-
-        // submit handler: validar y bloquear si no hay todo
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            form._attempted = true;
-            let allValid = true;
-            for (const f of fields) {
-                const val = (f.value === null) ? "" : String(f.value).trim();
-                if (!val) {
-                    f.classList.remove('is-valid');
-                    f.classList.add('is-invalid');
-                    if (allValid) f.focus(); // focus primer inválido
-                    allValid = false;
-                } else {
-                    f.classList.remove('is-invalid');
-                    f.classList.add('is-valid');
-                }
-            }
-            if (allValid) {
-                // enviar realmente
-                form.submit();
-            } else {
-                // opcional: mensaje al usuario (no cambia diseño)
-                window.scrollTo({ top: (form.getBoundingClientRect().top + window.scrollY - 20), behavior: 'smooth' });
-            }
-        });
-    }
-
-    // activar validación en ambos formularios
-    setupValidation('form-buscar');
-    setupValidation('participante-form');
-
-    /* ========== CASCADA: pais -> departamento -> provincia -> distrito ========== */
-    const paisSelect = document.getElementById("pais");
-    const depSelect  = document.getElementById("departamento");
-    const provSelect = document.getElementById("provincia");
-    const distSelect = document.getElementById("distrito");
-
-    function limpiarSelect(select, placeholder) {
-        if (!select) return;
-        select.innerHTML = `<option value="">${placeholder}</option>`;
-    }
-
-    // fetch wrappers
-    function fetchDepartamentos(paisId) {
-        return fetch(`/participante/api/departamentos/?pais_id=${encodeURIComponent(paisId)}`)
-            .then(r => r.ok ? r.json() : { departamentos: [] })
-            .then(j => j.departamentos || [])
-            .catch(()=>[]);
-    }
-    function fetchProvincias(depId) {
-        return fetch(`/participante/api/provincias/?departamento_id=${encodeURIComponent(depId)}`)
-            .then(r => r.ok ? r.json() : { provincias: [] })
-            .then(j => j.provincias || [])
-            .catch(()=>[]);
-    }
-    function fetchDistritos(provId) {
-        return fetch(`/participante/api/distritos/?provincia_id=${encodeURIComponent(provId)}`)
-            .then(r => r.ok ? r.json() : { distritos: [] })
-            .then(j => j.distritos || [])
-            .catch(()=>[]);
-    }
-
-    if (paisSelect) {
-        paisSelect.addEventListener("change", function() {
-            limpiarSelect(depSelect, "--Seleccione Departamento--");
-            limpiarSelect(provSelect, "--Seleccione Provincia--");
-            limpiarSelect(distSelect, "--Seleccione Distrito--");
-            if (this.value) {
-                fetchDepartamentos(this.value).then(data => {
-                    data.forEach(d => {
-                        depSelect.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
-                    });
-                    // trigger change para que se actualice validación si es necesario
-                    depSelect.dispatchEvent(new Event('change'));
-                });
-            }
-        });
-    }
-
-    if (depSelect) {
-        depSelect.addEventListener("change", function() {
-            limpiarSelect(provSelect, "--Seleccione Provincia--");
-            limpiarSelect(distSelect, "--Seleccione Distrito--");
-            if (this.value) {
-                fetchProvincias(this.value).then(data => {
-                    data.forEach(p => {
-                        provSelect.innerHTML += `<option value="${p.id}">${p.nombre}</option>`;
-                    });
-                    provSelect.dispatchEvent(new Event('change'));
-                });
-            }
-        });
-    }
-
-    if (provSelect) {
-        provSelect.addEventListener("change", function() {
-            limpiarSelect(distSelect, "--Seleccione Distrito--");
-            if (this.value) {
-                fetchDistritos(this.value).then(data => {
-                    data.forEach(d => {
-                        distSelect.innerHTML += `<option value="${d.id}">${d.nombre}</option>`;
-                    });
-                    distSelect.dispatchEvent(new Event('change'));
-                });
-            }
-        });
-    }
-
-});
-</script>
-</body>
-</html>
+{% block extra_js %}
+<script src="{% static 'Participante/js/acciones_buscar.js' %}"></script>
+{% endblock %}

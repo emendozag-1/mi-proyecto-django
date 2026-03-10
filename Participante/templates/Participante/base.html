@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Proyecto Django{% endblock %}</title>
+    <!-- CSS base para la aplicación -->
+    <link rel="stylesheet" href="{% static 'Participante/css/estilos.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% block content %}
+    <!-- Aquí irá el contenido principal de cada página -->
+    {% endblock %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

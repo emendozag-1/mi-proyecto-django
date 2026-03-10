@@ -1,0 +1,88 @@
+/* ====== DISEÑO BASE PARA FORMULARIOS ====== */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    padding: 2rem;
+    margin: 0;
+}
+.form-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.form-container h1 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #202124;
+    text-align: center;
+}
+.form-container h2 {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    color: #5f6368;
+}
+label {
+    font-weight: 500;
+    margin-top: 1rem;
+    display: block;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    border: 1px solid #dadce0;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+button, input[type="submit"] {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.8rem 1.2rem;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+button:hover, input[type="submit"]:hover {
+    background-color: #1669c1;
+}
+.info-box {
+    background: #f1f3f4;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+/* ====== VALIDACIÓN ====== */
+.is-valid {
+    border: 2px solid #28a745 !important;
+    background-color: #f0fff3 !important;
+}
+.is-invalid {
+    border: 2px solid #dc3545 !important;
+    background-color: #fff3f3 !important;
+}
+.error {
+    border-color: red !important;
+}
+
+/* ====== EXTRAS (Checkbox en la otra vista) ====== */
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+}
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Mantener todo responsive */
+@media (max-width: 640px) {
+    .form-container { padding: 1rem; }
+}
