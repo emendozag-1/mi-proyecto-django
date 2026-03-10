@@ -41,7 +41,11 @@ document.addEventListener("DOMContentLoaded", function() {
             e.preventDefault();
             form._attempted = true;
             let allValid = true;
-            for (const f of fields) {
+
+            // REFRESCAMOS LOS FIELDS POR SI CAMBIARON LOS 'REQUIRED' DINÁMICAMENTE
+            const currentFields = Array.from(form.querySelectorAll('[required]'));
+
+            for (const f of currentFields) {
                 const val = (f.value === null) ? "" : String(f.value).trim();
                 if (!val) {
                     f.classList.remove('is-valid');
@@ -100,6 +104,27 @@ document.addEventListener("DOMContentLoaded", function() {
             limpiarSelect(depSelect, "--Seleccione Departamento--");
             limpiarSelect(provSelect, "--Seleccione Provincia--");
             limpiarSelect(distSelect, "--Seleccione Distrito--");
+            
+            // LÓGICA PERÚ (ID = 1, asumiendo que 1 es Perú u obtener por texto)
+            // Si el texto seleccionado es "Perú" o "Peru" hacemos obligatorios los combos
+            const selectedText = this.options[this.selectedIndex]?.text.toLowerCase() || "";
+            const esPeru = selectedText.includes("perú") || selectedText.includes("peru");
+
+            if (esPeru) {
+                depSelect.setAttribute("required", "required");
+                provSelect.setAttribute("required", "required");
+                distSelect.setAttribute("required", "required");
+            } else {
+                depSelect.removeAttribute("required");
+                provSelect.removeAttribute("required");
+                distSelect.removeAttribute("required");
+                
+                // Limpiamos estilos de validación si ya no son requeridos
+                [depSelect, provSelect, distSelect].forEach(sel => {
+                    sel.classList.remove("is-invalid", "is-valid");
+                });
+            }
+
             if (this.value) {
                 fetchDepartamentos(this.value).then(data => {
                     data.forEach(d => {
@@ -109,6 +134,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
             }
         });
+
+        // Disparar validación on load por si ya hay un país preseleccionado al editar
+        setTimeout(() => paisSelect.dispatchEvent(new Event('change')), 100);
     }
 
     if (depSelect) {
