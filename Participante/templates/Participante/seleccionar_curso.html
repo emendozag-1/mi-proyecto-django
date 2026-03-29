@@ -55,7 +55,7 @@
 
         <div id="certificado-container" style="display:none;">
             <label id="certificado-label" for="certificado">¿Desea certificado?</label>
-            <select id="certificado" name="certificado">
+            <select id="certificado" name="desea_certificado">
                 <option value="">-- Selecciona una opción --</option>
                 <option value="1">Sí</option>
                 <option value="0">No</option>
@@ -152,5 +152,10 @@
             alert("Por favor, complete todos los campos obligatorios.");
         }
     });
+
+    // Restaurar visibilidad si el navegador retiene el valor seleccionado
+    if (cursoSelect.value !== "") {
+        cursoSelect.dispatchEvent(new Event('change'));
+    }
 </script>
 {% endblock %}
