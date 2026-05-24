@@ -1,0 +1,395 @@
+{% extends 'Participante/base.html' %}
+{% load static %}
+
+{% block title %}{{ cuestionario.NombreCuestionario }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f0ebf8;
+        font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
+        color: #202124;
+    }
+    .survey-header-card {
+        max-width: 640px;
+        margin: 1.5rem auto 1rem auto;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        overflow: hidden;
+        border-top: 8px solid #673ab7; /* Borde superior morado grueso */
+    }
+    .survey-header-content {
+        padding: 1.5rem 2rem;
+    }
+    .survey-header-title {
+        font-size: 2rem;
+        font-weight: 400;
+        margin: 0 0 1rem 0;
+        line-height: 1.25;
+    }
+    .survey-header-desc {
+        font-size: 0.95rem;
+        color: #5f6368;
+        line-height: 1.5;
+        border-bottom: 1px solid #dadce0;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    .survey-required-notice {
+        color: #d93025;
+        font-size: 0.85rem;
+    }
+    
+    .question-card {
+        max-width: 640px;
+        margin: 0.8rem auto;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        padding: 1.5rem 2rem;
+        box-sizing: border-box;
+    }
+    .question-title {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 1.2rem;
+        line-height: 1.5;
+    }
+    .required-star {
+        color: #d93025;
+        margin-left: 0.2rem;
+    }
+
+    /* Estilo de inputs */
+    .input-text, .input-textarea, .input-select {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #dadce0;
+        font-size: 0.95rem;
+        padding: 0.5rem 0;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-bottom-color 0.2s;
+    }
+    .input-text:focus, .input-textarea:focus {
+        border-bottom: 2px solid #673ab7;
+    }
+    .input-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    /* Escala lineal (Tipo 7) */
+    .linear-scale-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1.5rem 0 0.5rem 0;
+        max-width: 500px;
+    }
+    .linear-scale-label {
+        font-size: 0.9rem;
+        color: #5f6368;
+        flex: 1;
+    }
+    .linear-scale-label.left {
+        text-align: right;
+        margin-right: 1.5rem;
+    }
+    .linear-scale-label.right {
+        text-align: left;
+        margin-left: 1.5rem;
+    }
+    .linear-scale-options {
+        display: flex;
+        justify-content: space-between;
+        flex: 3;
+    }
+    .linear-scale-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .linear-scale-num {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        color: #5f6368;
+    }
+    .linear-scale-radio {
+        width: 20px;
+        height: 20px;
+        accent-color: #673ab7;
+        cursor: pointer;
+    }
+
+    /* Calificación por Estrellas (Tipo 8) */
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+    .star-rating input {
+        display: none;
+    }
+    .star-rating label {
+        font-size: 2rem;
+        color: #ccc;
+        cursor: pointer;
+        padding: 0 0.1rem;
+        margin: 0;
+        transition: color 0.2s;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #f4b400; /* Color amarillo estrella */
+    }
+
+    /* Cuadrícula (Tipo 9 y 10) */
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    .grid-table th {
+        font-weight: 500;
+        color: #5f6368;
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 0.8rem;
+    }
+    .grid-table td {
+        padding: 0.8rem;
+        border-bottom: 1px solid #f1f3f4;
+    }
+    .grid-table tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+    .grid-row-label {
+        font-size: 0.9rem;
+        color: #202124;
+        width: 40%;
+    }
+    .grid-radio-cell {
+        text-align: center;
+    }
+    .grid-radio-cell input {
+        width: 18px;
+        height: 18px;
+        accent-color: #673ab7;
+        cursor: pointer;
+    }
+
+    /* Opciones simples (Radio/Checkbox) */
+    .option-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-top: 0.5rem;
+    }
+    .option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 0.95rem;
+    }
+    .option-item input[type="radio"], .option-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #673ab7;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    /* Botones */
+    .survey-footer {
+        max-width: 640px;
+        margin: 1.5rem auto 3rem auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .btn-submit {
+        background-color: #673ab7;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.6rem 1.8rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .btn-submit:hover {
+        background-color: #512da8;
+    }
+    .btn-back {
+        background: transparent;
+        color: #673ab7;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 0.6rem 1.8rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.2s;
+    }
+    .btn-back:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="post" id="survey-form">
+    {% csrf_token %}
+    
+    <!-- TARJETA DE CABECERA (Header) -->
+    <div class="survey-header-card">
+        <div class="survey-header-content">
+            <h1 class="survey-header-title">Encuesta AP "{{ curso.NombreCurso }}"</h1>
+            <div class="survey-header-desc">
+                Atención participantes, la Red Educativa CJAE agradece su participación en la Actualización Pedagógica Gratuita 
+                <strong>"{{ curso.NombreCurso }}"</strong>. Para poder seguir mejorando le pedimos que por favor nos pueda apoyar con la siguiente encuesta.
+            </div>
+            <div class="survey-required-notice">* Indica que la pregunta es obligatoria</div>
+        </div>
+    </div>
+
+    <!-- PREGUNTAS DINÁMICAS -->
+    {% for pregunta in preguntas %}
+        <div class="question-card">
+            <div class="question-title">
+                {{ pregunta.NombrePregunta }}
+                <span class="required-star">*</span>
+            </div>
+
+            <!-- RENDERIZADO SEGÚN TIPO DE PREGUNTA (IdTipoPregunta) -->
+            {% if pregunta.tipo_pregunta.IdTipoPregunta == 1 %}
+                <!-- 1. Texto Corto -->
+                <input type="text" name="pregunta_{{ pregunta.IdPregunta }}" class="input-text" placeholder="Tu respuesta" required>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 2 %}
+                <!-- 2. Párrafo -->
+                <textarea name="pregunta_{{ pregunta.IdPregunta }}" class="input-textarea" placeholder="Tu respuesta larga" required></textarea>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 3 %}
+                <!-- 3. Numérico -->
+                <input type="number" name="pregunta_{{ pregunta.IdPregunta }}" class="input-text" placeholder="Tu respuesta numérica" required>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 4 %}
+                <!-- 4. Selección única (Radio) -->
+                <div class="option-list">
+                    <label class="option-item">
+                        <input type="radio" name="pregunta_{{ pregunta.IdPregunta }}" value="Opción 1" required> Opción 1
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="pregunta_{{ pregunta.IdPregunta }}" value="Opción 2"> Opción 2
+                    </label>
+                </div>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 5 %}
+                <!-- 5. Selección múltiple (Checkbox) -->
+                <div class="option-list">
+                    <label class="option-item">
+                        <input type="checkbox" name="pregunta_{{ pregunta.IdPregunta }}" value="Opción A"> Opción A
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" name="pregunta_{{ pregunta.IdPregunta }}" value="Opción B"> Opción B
+                    </label>
+                </div>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 6 %}
+                <!-- 6. Lista desplegable -->
+                <select name="pregunta_{{ pregunta.IdPregunta }}" class="input-select" required>
+                    <option value="">-- Selecciona --</option>
+                    <option value="Opción X">Opción X</option>
+                    <option value="Opción Y">Opción Y</option>
+                </select>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 7 %}
+                <!-- 7. Escala Lineal (1 al 5) -->
+                <div class="linear-scale-container">
+                    <div class="linear-scale-label left">Malo</div>
+                    <div class="linear-scale-options">
+                        {% for i in "12345" %}
+                            <div class="linear-scale-item">
+                                <span class="linear-scale-num">{{ i }}</span>
+                                <input type="radio" name="pregunta_{{ pregunta.IdPregunta }}" value="{{ i }}" class="linear-scale-radio" required>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="linear-scale-label right">Bueno</div>
+                </div>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 8 %}
+                <!-- 8. Calificación (Estrellas) -->
+                <div class="star-rating">
+                    {% for i in "54321" %}
+                        <input type="radio" id="star_{{ pregunta.IdPregunta }}_{{ i }}" name="pregunta_{{ pregunta.IdPregunta }}" value="{{ i }}" required />
+                        <label for="star_{{ pregunta.IdPregunta }}_{{ i }}">★</label>
+                    {% endfor %}
+                </div>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 9 or pregunta.tipo_pregunta.IdTipoPregunta == 10 %}
+                <!-- 9/10. Cuadrícula (Selección única o múltiple) -->
+                <table class="grid-table">
+                    <thead>
+                        <tr>
+                            <th>Subpregunta</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Asignamos una fila de evaluación con radios/checks -->
+                        <tr>
+                            <td class="grid-row-label">
+                                {% if pregunta.sub_pregunta %}
+                                    {{ pregunta.sub_pregunta.NombreSubPregunta }}
+                                {% else %}
+                                    Criterio General de Evaluación
+                                {% endif %}
+                            </td>
+                            {% for i in "12345" %}
+                                <td class="grid-radio-cell">
+                                    {% if pregunta.tipo_pregunta.IdTipoPregunta == 9 %}
+                                        <input type="radio" name="pregunta_{{ pregunta.IdPregunta }}" value="{{ i }}" required>
+                                    {% else %}
+                                        <input type="checkbox" name="pregunta_{{ pregunta.IdPregunta }}" value="{{ i }}">
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 11 %}
+                <!-- 11. Fecha -->
+                <input type="date" name="pregunta_{{ pregunta.IdPregunta }}" class="input-text" required>
+
+            {% elif pregunta.tipo_pregunta.IdTipoPregunta == 12 %}
+                <!-- 12. Hora -->
+                <input type="time" name="pregunta_{{ pregunta.IdPregunta }}" class="input-text" required>
+
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="question-card">
+            <p>No se encontraron preguntas en el sistema.</p>
+        </div>
+    {% endfor %}
+
+    <!-- FOOTER Y BOTÓN ENVIAR -->
+    <div class="survey-footer">
+        <a href="{% url 'encuestas:seleccionar_encuesta' %}" class="btn-back">Atrás</a>
+        <button type="submit" class="btn-submit">Enviar</button>
+    </div>
+</form>
+{% endblock %}

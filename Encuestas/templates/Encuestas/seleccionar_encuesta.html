@@ -1,0 +1,164 @@
+{% extends 'Participante/base.html' %}
+{% load static %}
+
+{% block title %}Seleccionar Encuesta{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f0ebf8; /* Color fondo lavanda pastel */
+        font-family: 'Roboto', 'Google Sans', sans-serif;
+    }
+    .survey-card-header {
+        background-color: #673ab7; /* Color morado de Google Forms */
+        height: 10px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+    .survey-container {
+        max-width: 640px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border: 1px solid #dadce0;
+        overflow: hidden;
+    }
+    .survey-body {
+        padding: 2.5rem;
+    }
+    .survey-title {
+        font-size: 2rem;
+        font-weight: 400;
+        margin-bottom: 1.5rem;
+        color: #202124;
+        text-align: left;
+    }
+    .survey-description {
+        font-size: 0.95rem;
+        color: #5f6368;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+    label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #202124;
+        margin-top: 1.5rem;
+        display: block;
+    }
+    select {
+        width: 100%;
+        padding: 0.8rem;
+        margin-top: 0.5rem;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        background-color: #fff;
+        transition: border-color 0.2s;
+    }
+    select:focus {
+        border-color: #673ab7;
+        outline: none;
+    }
+    .btn-submit {
+        background-color: #673ab7;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        margin-top: 2rem;
+        float: right;
+        transition: background-color 0.2s;
+    }
+    .btn-submit:hover {
+        background-color: #512da8;
+    }
+    .clear {
+        clear: both;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="survey-container">
+    <div class="survey-card-header"></div>
+    <div class="survey-body">
+        <h1 class="survey-title">Encuestas de Actualización Pedagógica</h1>
+        <p class="survey-description">
+            Bienvenido al sistema de encuestas de la Red Educativa CJAE. Por favor, selecciona el tipo de cuestionario y el curso correspondiente para comenzar.
+        </p>
+
+        <form method="post" id="form-seleccion">
+            {% csrf_token %}
+
+            <label for="tipo_cuestionario">1. Tipo de Cuestionario *</label>
+            <select id="tipo_cuestionario" name="tipo_cuestionario" required>
+                <option value="">-- Selecciona el tipo --</option>
+                {% for tipo in tipos_cuestionario %}
+                    <option value="{{ tipo.IdTipoCuestionario }}">{{ tipo.NombreTipoCuestionario }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="cuestionario">2. Encuesta / Evaluación específica *</label>
+            <select id="cuestionario" name="cuestionario" required disabled>
+                <option value="">-- Primero selecciona el tipo --</option>
+            </select>
+
+            <label for="curso">3. Curso asociado *</label>
+            <select id="curso" name="curso" required>
+                <option value="">-- Selecciona el curso --</option>
+                {% for curso in cursos %}
+                    <option value="{{ curso.IdCurso }}">{{ curso.NombreCurso }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn-submit">Continuar</button>
+            <div class="clear"></div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const tipoSelect = document.getElementById('tipo_cuestionario');
+    const cuestionarioSelect = document.getElementById('cuestionario');
+
+    tipoSelect.addEventListener('change', function() {
+        const tipoId = this.value;
+        cuestionarioSelect.innerHTML = '<option value="">-- Cargando opciones... --</option>';
+        cuestionarioSelect.disabled = true;
+
+        if (!tipoId) {
+            cuestionarioSelect.innerHTML = '<option value="">-- Primero selecciona el tipo --</option>';
+            return;
+        }
+
+        fetch(`api/cuestionarios/?tipo_id=${tipoId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.cuestionarios.length > 0) {
+                    cuestionarioSelect.innerHTML = '<option value="">-- Selecciona una encuesta --</option>';
+                    data.cuestionarios.forEach(c => {
+                        const option = document.createElement('option');
+                        option.value = c.IdCuestionario;
+                        option.textContent = c.NombreCuestionario;
+                        cuestionarioSelect.appendChild(option);
+                    });
+                    cuestionarioSelect.disabled = false;
+                } else {
+                    cuestionarioSelect.innerHTML = '<option value="">-- No hay cuestionarios para este tipo --</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar cuestionarios:', error);
+                cuestionarioSelect.innerHTML = '<option value="">-- Error al cargar --</option>';
+            });
+    });
+</script>
+{% endblock %}

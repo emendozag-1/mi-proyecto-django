@@ -1,0 +1,71 @@
+{% extends 'Participante/base.html' %}
+{% load static %}
+
+{% block title %}Encuesta Enviada{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f0ebf8;
+        font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
+    }
+    .success-container {
+        max-width: 640px;
+        margin: 4rem auto;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid #dadce0;
+        border-top: 8px solid #673ab7;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .success-body {
+        padding: 3rem;
+        text-align: center;
+    }
+    .success-icon {
+        font-size: 4rem;
+        color: #673ab7;
+        margin-bottom: 1.5rem;
+    }
+    .success-title {
+        font-size: 2rem;
+        font-weight: 400;
+        color: #202124;
+        margin-bottom: 1rem;
+    }
+    .success-message {
+        font-size: 1rem;
+        color: #5f6368;
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+    }
+    .btn-new-response {
+        background-color: #673ab7;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        padding: 0.8rem 2rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: background-color 0.2s;
+        display: inline-block;
+    }
+    .btn-new-response:hover {
+        background-color: #512da8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-body">
+        <div class="success-icon">✓</div>
+        <h1 class="success-title">Muchas gracias</h1>
+        <p class="success-message">
+            Se ha registrado tu respuesta. Tu feedback nos ayuda a seguir mejorando las actualizaciones pedagógicas de la Red Educativa CJAE.
+        </p>
+        <a href="{% url 'encuestas:seleccionar_encuesta' %}" class="btn-new-response">Enviar otra respuesta</a>
+    </div>
+</div>
+{% endblock %}

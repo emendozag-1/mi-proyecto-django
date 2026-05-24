@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Participante',
     'Cursos',
+    'Encuestas',
 ]
 
 MIDDLEWARE = [

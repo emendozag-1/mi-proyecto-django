@@ -21,5 +21,6 @@ from Participante import views as participante_views  # importa tu vista
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('participante/', include('Participante.urls')),  # tus rutas de la app
+    path('encuesta/', include('Encuestas.urls')),         # nuevas rutas de encuestas
     path('', participante_views.buscar_participante),     # la raíz apunta a tu vista principal
 ]
