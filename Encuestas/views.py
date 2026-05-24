@@ -14,17 +14,31 @@ from .models import (
 def seleccionar_encuesta(request):
     tipos_cuestionario = DimTipoCuestionario.objects.all()
     cursos = Fact_Curso.objects.filter(SitioWebCurso=1)
+    error_mensaje = None
     
     if request.method == 'POST':
         id_cuestionario = request.POST.get('cuestionario')
+        id_tipo = request.POST.get('tipo_cuestionario')
         id_curso = request.POST.get('curso')
         
-        if id_cuestionario and id_curso:
-            return redirect('encuestas:responder_encuesta', id_cuestionario=id_cuestionario, id_curso=id_curso)
+        if id_curso:
+            # Si no se seleccionó cuestionario específico, buscamos el primero de ese tipo
+            if not id_cuestionario and id_tipo:
+                primer_cuestionario = FactCuestionario.objects.filter(tipo_cuestionario_id=id_tipo).first()
+                if primer_cuestionario:
+                    id_cuestionario = primer_cuestionario.IdCuestionario
+                else:
+                    error_mensaje = "No existen cuestionarios registrados para el tipo seleccionado."
+            
+            if id_cuestionario:
+                return redirect('encuestas:responder_encuesta', id_cuestionario=id_cuestionario, id_curso=id_curso)
+            elif not error_mensaje:
+                error_mensaje = "Por favor selecciona una encuesta o tipo de cuestionario válido."
             
     context = {
         'tipos_cuestionario': tipos_cuestionario,
         'cursos': cursos,
+        'error_mensaje': error_mensaje,
     }
     return render(request, 'Encuestas/seleccionar_encuesta.html', context)
 

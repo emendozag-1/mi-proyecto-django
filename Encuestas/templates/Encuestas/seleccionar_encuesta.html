@@ -93,6 +93,12 @@
             Bienvenido al sistema de encuestas de la Red Educativa CJAE. Por favor, selecciona el tipo de cuestionario y el curso correspondiente para comenzar.
         </p>
 
+        {% if error_mensaje %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+            {{ error_mensaje }}
+        </div>
+        {% endif %}
+
         <form method="post" id="form-seleccion">
             {% csrf_token %}
 
@@ -104,8 +110,8 @@
                 {% endfor %}
             </select>
 
-            <label for="cuestionario">2. Encuesta / Evaluación específica *</label>
-            <select id="cuestionario" name="cuestionario" required disabled>
+            <label for="cuestionario">2. Encuesta / Evaluación específica (Opcional)</label>
+            <select id="cuestionario" name="cuestionario" disabled>
                 <option value="">-- Primero selecciona el tipo --</option>
             </select>
 
@@ -143,7 +149,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.cuestionarios.length > 0) {
-                    cuestionarioSelect.innerHTML = '<option value="">-- Selecciona una encuesta --</option>';
+                    cuestionarioSelect.innerHTML = '<option value="">-- Predeterminada (Opcional) --</option>';
                     data.cuestionarios.forEach(c => {
                         const option = document.createElement('option');
                         option.value = c.IdCuestionario;
